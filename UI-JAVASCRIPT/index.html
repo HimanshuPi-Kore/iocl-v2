@@ -1,0 +1,61 @@
+<!DOCTYPE>
+<html>
+	<head>
+		<script src="libs/moment.js?v=1.0" type="text/javascript"></script>
+		
+		<script src="../libs/lodash.min.js?v=1.0"></script>
+		<script src='../libs/anonymousassertion.js?v=1.0'></script>
+		<script src="../kore-bot-sdk-client.js?v=1.0"></script>
+		<script src="chatWindow.js?v=1.0" type="text/javascript"></script>
+		<link href="chatWindow.css?v=1.0" rel="stylesheet"></link>
+	</head>
+	<body background="../Bots_Platform.png"> 
+		<div id="chatContainer">
+		<button class="openChatWindow" id="openChatWindow">Open Chat Window</button>
+		</div>
+		<script type="text/javascript">
+			function assertion(options, callback) {
+
+				// Client has to fill the claims and call the callback.
+				var xhr = new XMLHttpRequest();
+
+				xhr.open('POST', 'https://pilot-bots.kore.com/api/users/sts');
+				xhr.setRequestHeader('Content-Type', 'application/json');
+				xhr.setRequestHeader('Authorization', 'bearer -----------');
+				xhr.onload = function() {
+					if (xhr.status === 200) {
+						var data = JSON.parse(xhr.responseText);
+						options.assertion = data.jwt
+						callback(null, options);
+						console.log(data);
+					}
+				};
+				xhr.send();
+			}
+
+			var botOptions = {};
+			botOptions.logLevel = 'debug';
+			botOptions.koreAPIUrl = "https://pilot-bots.kore.com/api/";
+			botOptions.assertionFn = assertion;
+			/*
+			 Below config:(To support the anonymous user)
+			 Case.1:Anonymous User
+			        a. set it to false if the client defined the assertion for Anonymous User.
+			        b. set it to true if the client have not defined the assertion for Anonymous User.
+			 Case.2:Logged-In User
+			        a. set it to false if the client defined the assertion.
+			*/
+			botOptions.test = true;
+			botOptions.koreAnonymousFn = koreAnonymousFn;
+			botOptions.clientId   = "cs-02d4510d-1b01-50b5-be7c-c30c1dc0f965";
+			botOptions.botInfo =  {name:"Field Force","_id":"st-f7087925-190e-54be-8bc6-09399b0bf131"}; 
+			
+			var chatConfig={
+				botOptions:botOptions
+			};
+			document.getElementById('openChatWindow').addEventListener('click',function() {
+				koreBotChat().show(chatConfig);
+			});
+		</script>
+	</body>
+</html>
